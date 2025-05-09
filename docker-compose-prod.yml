@@ -1,0 +1,44 @@
+services:
+  backend:
+    build: ./services/backend
+    volumes:
+      - ./services/backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - "ORIGIN=http://public.domain.quarantine.ui"
+      - "ENVIRONMENT=prod"
+    command: bash -c "cd src && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    uts: host
+    networks:
+      - my_network
+  frontend:
+    build: ./services/frontend
+    volumes:
+      - './services/frontend:/app'
+      - '/app/node_modules'
+    command: npm run dev
+    networks:
+      - my_network
+    environment:
+      - "VITE_API_URL=https://public.domain.quarantine.ui/api"
+    depends_on:
+      - backend
+  reverse-proxy:
+    build: ./services/reverse-proxy
+    networks:
+      - my_network
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - "BASIC_USERNAME=username"
+      - "BASIC_PASSWORD=password"
+      - "FORWARD_HOST=localhost"
+      - "FORWARD_PORT=5173"
+      - "FORWARD_PORT_API=8000"
+      - "PUBLIC_DOMAIN=public.domain.quarantine.ui"
+    depends_on:
+      - frontend
+networks:
+  my_network:
+    driver: bridge

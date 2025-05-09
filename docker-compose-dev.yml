@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./services/backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - "ORIGIN=http://localhost:5173"
+      - "ENVIRONMENT=dev"
+    command: bash -c "cd src && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    uts: host
+    networks:
+      - my_network
+  frontend:
+    build: ./services/frontend
+    volumes:
+      - './services/frontend:/app'
+      - '/app/node_modules'
+    command: npm run dev
+    networks:
+      - my_network
+    ports:
+      - "5173:5173"
+    environment:
+      - "VITE_API_URL=http://localhost:8000"
+    depends_on:
+      - backend
+networks:
+  my_network:
+    driver: bridge
