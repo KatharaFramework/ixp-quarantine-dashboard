@@ -1,3 +1,0 @@
-[submodule "services/backend/src/digital_twin"]
-	path = services/backend/src/digital_twin
-	url = git@gitlab.com:uniroma3/compunet/networks/ixp-digital-twin/digital-twin.git
