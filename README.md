@@ -71,7 +71,7 @@ To set up the repository along with the `ixp-digital-twin` submodule, follow the
    If the repository has already been cloned without submodules, initialize and update the submodule manually:
    ```shell script
    git submodule init
-      git submodule update
+   git submodule update
    ```
 
 3. **Pull Updates for Submodule** (Optional)  
