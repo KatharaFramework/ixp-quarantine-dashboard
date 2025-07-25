@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import axios from "axios";
-import {Col, Container, Row} from 'react-bootstrap';
+import {Col, Container, Row, Form} from 'react-bootstrap';
 import CurrentActionCard from "../components/CurrentActionCard.jsx";
 import ResultsView from "../components/ResultsView.jsx";
 import ToggleFilter from "../components/ToggleFilter.jsx";
@@ -28,6 +28,7 @@ export default function QuarantineDashboard() {
     const [checkEnded, setCheckEnded] = useState(false);
     const [showConfirmStop, setShowConfirmStop] = useState(false);
     const [viewFailed, setViewFailed] = useState(1);
+    const [bgpCheckActive, setBgpCheckActive] = useState(false);
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -64,7 +65,7 @@ export default function QuarantineDashboard() {
         data.uid = userId;
         data.last = last;
         return new Promise((resolve, reject) => {
-            axios.post(`${apiUrl}/check/${data.action}`, data, { signal: signal })
+            axios.post(`${apiUrl}/check/${data.action}`, data, {signal: signal})
                 .then(response => {
                     if (response.data && response.data.data && response.data.data.results) {
                         resolve(response.data.data);
@@ -83,8 +84,26 @@ export default function QuarantineDashboard() {
         setViewFailed(val);
     };
 
+    const getFilteredActionOptions = (actionOptions, bgpCheckActive) => {
+        return bgpCheckActive
+            ? actionOptions // Include all actions if bgpCheckActive is true
+            : actionOptions.filter(action => !action.toLowerCase().includes("bgp")); // Exclude BGP actions
+    };
+
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (bgpCheckActive) {
+            const userConfirmed = window.confirm(
+                "BGP checks are active! Before proceeding, " +
+                "ensure that the device under test is not connected to the Internet. Continue?"
+            );
+
+            if (!userConfirmed) {
+                return;
+            }
+        }
 
         setLoadingQuarantineCheck(true);
         setStatus('');
@@ -107,7 +126,9 @@ export default function QuarantineDashboard() {
         };
 
         try {
-            for (const [i, action] of actionOptions.entries()) {
+            const filteredActionOptions = getFilteredActionOptions(actionOptions, bgpCheckActive);
+
+            for (const [i, action] of filteredActionOptions.entries()) {
                 if (stopCheck.current)
                     break;
 
@@ -184,6 +205,18 @@ export default function QuarantineDashboard() {
     return (
         <Container>
             <h1 className="text-center mb-4">IXP Quarantine Checker</h1>
+            <Row className="my-3">
+                <Col>
+                    <Form.Check
+                        type="switch"
+                        id="bgp-check-active-switch"
+                        label="BGP Check Active"
+                        checked={bgpCheckActive}
+                        onChange={(e) => setBgpCheckActive(e.target.checked)}
+                    />
+                </Col>
+            </Row>
+
             <QuarantineForm
                 asn={asn}
                 setAsn={setAsn}
@@ -198,12 +231,13 @@ export default function QuarantineDashboard() {
                 handleStopClick={handleStopClick}
                 handleSubmit={handleSubmit}
             />
+
             <br/>
             <Row className="justify-content-center align-content-center">
                 <Container>
                     {
                         checkEnded ?
-                            <StatusCard status={status} msg={statusMsg} />
+                            <StatusCard status={status} msg={statusMsg}/>
                             :
                             (
                                 <div ref={currentActionRef}>
@@ -215,7 +249,7 @@ export default function QuarantineDashboard() {
                     <Row className="align-items-center my-3">
                         <Col className="d-flex justify-content-end">
                             {(loadingQuarantineCheck || checkEnded) && results.length > 0 && (
-                                <ToggleFilter viewFailed={viewFailed} handleFilter={handleFilter} />
+                                <ToggleFilter viewFailed={viewFailed} handleFilter={handleFilter}/>
                             )}
                         </Col>
                     </Row>
