@@ -1,3 +1,4 @@
+
 import React, {useEffect, useRef, useState} from 'react';
 import axios from "axios";
 import {Col, Container, Row, Form} from 'react-bootstrap';
@@ -7,6 +8,7 @@ import ToggleFilter from "../components/ToggleFilter.jsx";
 import StatusCard from "../components/StatusCard.jsx";
 import QuarantineForm from "../components/QuarantineForm.jsx";
 import StopModal from "../components/StopModal.jsx";
+import ConfirmModal from "../components/ConfirmModal.jsx";
 
 const userId = "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
     (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
@@ -27,6 +29,7 @@ export default function QuarantineDashboard() {
     const [statusMsg, setStatusMsg] = useState('');
     const [checkEnded, setCheckEnded] = useState(false);
     const [showConfirmStop, setShowConfirmStop] = useState(false);
+    const [showBgpConfirm, setShowBgpConfirm] = useState(false);
     const [viewFailed, setViewFailed] = useState(1);
     const [bgpCheckActive, setBgpCheckActive] = useState(false);
 
@@ -90,21 +93,7 @@ export default function QuarantineDashboard() {
             : actionOptions.filter(action => !action.toLowerCase().includes("bgp")); // Exclude BGP actions
     };
 
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        if (bgpCheckActive) {
-            const userConfirmed = window.confirm(
-                "BGP checks are active! Before proceeding, " +
-                "ensure that the device under test is not connected to the Internet. Continue?"
-            );
-
-            if (!userConfirmed) {
-                return;
-            }
-        }
-
+    const proceedWithCheck = async () => {
         setLoadingQuarantineCheck(true);
         setStatus('');
         setStatusMsg('');
@@ -185,6 +174,26 @@ export default function QuarantineDashboard() {
         setLoadingQuarantineCheck(false);
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (bgpCheckActive) {
+            setShowBgpConfirm(true);
+            return;
+        }
+
+        await proceedWithCheck();
+    };
+
+    const handleBgpConfirm = async () => {
+        setShowBgpConfirm(false);
+        await proceedWithCheck();
+    };
+
+    const handleBgpCancel = () => {
+        setShowBgpConfirm(false);
+    };
+
     const handleStopClick = () => {
         setShowConfirmStop(true);
     };
@@ -260,6 +269,12 @@ export default function QuarantineDashboard() {
                         show={showConfirmStop}
                         onConfirm={handleConfirmStop}
                         onCancel={handleCancelStop}
+                    />
+
+                    <ConfirmModal
+                        show={showBgpConfirm}
+                        onConfirm={handleBgpConfirm}
+                        onCancel={handleBgpCancel}
                     />
                 </Container>
             </Row>
