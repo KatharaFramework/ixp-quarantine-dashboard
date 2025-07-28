@@ -214,17 +214,6 @@ export default function QuarantineDashboard() {
     return (
         <Container>
             <h1 className="text-center mb-4">IXP Quarantine Checker</h1>
-            <Row className="my-3">
-                <Col>
-                    <Form.Check
-                        type="switch"
-                        id="bgp-check-active-switch"
-                        label="BGP Check Active"
-                        checked={bgpCheckActive}
-                        onChange={(e) => setBgpCheckActive(e.target.checked)}
-                    />
-                </Col>
-            </Row>
 
             <QuarantineForm
                 asn={asn}
@@ -239,6 +228,8 @@ export default function QuarantineDashboard() {
                 currentAction={currentAction}
                 handleStopClick={handleStopClick}
                 handleSubmit={handleSubmit}
+                bgpCheckActive={bgpCheckActive}
+                setBgpCheckActive={setBgpCheckActive}
             />
 
             <br/>

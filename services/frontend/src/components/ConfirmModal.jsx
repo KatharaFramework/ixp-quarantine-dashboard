@@ -6,14 +6,11 @@ const ConfirmModal = ({ show, onConfirm, onCancel }) => {
     return (
         <Modal show={show} onHide={onCancel} centered>
             <Modal.Header closeButton>
-                <Modal.Title className="text-warning">
-                    ⚠️ BGP Checks Active
+                <Modal.Title>
+                    ⚠️ BGP Checks Are Active!
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p className="mb-3">
-                    <strong>BGP checks are active!</strong>
-                </p>
                 <p className="mb-0">
                     Before proceeding, ensure that the device under test is
                     <strong> not connected to the Internet</strong>.

@@ -14,6 +14,8 @@ const QuarantineForm = ({
     currentAction,
     handleStopClick,
     handleSubmit,
+    bgpCheckActive,
+    setBgpCheckActive
 }) => {
     return (
         <Form onSubmit={handleSubmit}>
@@ -67,6 +69,20 @@ const QuarantineForm = ({
                             disabled={loadingQuarantineCheck}
                         />
                     </Form.Group>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col>
+                    <Form.Check
+                        type="switch"
+                        id="bgp-check-active-switch"
+                        label="Activate BGP Checks"
+                        checked={bgpCheckActive}
+                        onChange={(e) => setBgpCheckActive(e.target.checked)}
+                        disabled={loadingQuarantineCheck}
+                        className="mb-3"
+                    />
                 </Col>
             </Row>
 
