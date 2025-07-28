@@ -89,8 +89,8 @@ export default function QuarantineDashboard() {
 
     const getFilteredActionOptions = (actionOptions, bgpCheckActive) => {
         return bgpCheckActive
-            ? actionOptions // Include all actions if bgpCheckActive is true
-            : actionOptions.filter(action => !action.toLowerCase().includes("bgp")); // Exclude BGP actions
+            ? actionOptions
+            : actionOptions.filter(action => !action.toLowerCase().includes("bgp."));
     };
 
     const proceedWithCheck = async () => {
