@@ -7,10 +7,11 @@ ENV PATH="${PATH}:/root/.local/bin"
 ENV PYTHONPATH=.
 
 COPY requirements.txt .
-COPY src/digital_twin/requirements.txt requirements-submodule.txt
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-submodule.txt
+RUN git clone https://github.com/KatharaFramework/ixp-digital-twin.git && \
+    pip install -r ixp-digital-twin/requirements.txt && \
+    rm -rf ixp-digital-twin
 
 COPY src/ .
