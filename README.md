@@ -56,76 +56,44 @@ The IXP Quarantine Dashboard can be deployed and run either using Docker or by s
 
 ### Initialize the Digital Twin
 
-Assume we have a root folder called `digital-twin`.
-
-In `digital-twin`, clone the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) repository using the command:
-```bash
-git clone git@github.com:KatharaFramework/ixp-digital-twin.git
-```
-
-Add proper configurations for the IXP Digital Twin in the `digital-twin/ixp-digital-twin` folder. 
-For more information, refer to the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) setup instructions.
- 
-In `digital-twin`, clone the IXP Quarantine Dashboard repository using the following command:
+Clone the IXP Quarantine Dashboard repository using the following command:
 ```shell script
 git clone git@github.com:KatharaFramework/ixp-quarantine-dashboard.git
 ```
 
-At the end, the folder structure should be:
+Enter the folder:
+```shell script
+cd ixp-quarantine-dashboard
 ```
-digital-twin/
-├─ ixp-digital-twin/
-├─ ixp-quarantine-dashboard/
+
+Clone the IXP Digital Twin in the parent folder:
+```shell script
+./init_digital_twin.sh
 ```
+This will clone into the `../ixp-digital-twin/` folder. You can change the destination folder by running: `./init_digital_twin.sh /another/folder`.
 
 ### Running with Docker
 
 1. Run the digital twin using the `run_digital_twin.sh` script
-2. Modify the `docker-compose-{dev,prod}.yml` file to adjust ports and hostnames as needed for your environment.
-  - You can change the digital twin folder from the default `../ixp-digital-twin` by changing the volume mounted for the `backend` service.
-4. Start the dashboard application using Docker:
+    1. You can change the default digital twin folder `../ixp-digital-twin` by passing the new path as argument:
+   ```shell script
+    ./run_digital_twin.sh /another/folder
+    ```
+2. Modify the `docker-compose-{dev,prod}.yml` file to adjust ports and hostnames as needed for your environment. 
+   1. You can change the default digital twin folder `../ixp-digital-twin` by changing the volume mounted for the `backend` service:
+       ```yaml
+         - services:
+           backend:
+             build: ./services/backend
+             volumes:
+               ...
+               - ../ixp-digital-twin:/app/src/digital_twin # => Change to /another/folder:/app/src/digital_twin
+       ```
+3. Start the dashboard application using Docker:
     ```bash
     docker compose up --build -d
     ```
-5. Access the dashboard via your web browser (default: `http://localhost:5173`).
-
-### Development Setup (Running Locally)
-
-To run the dashboard locally, you additionally require:
-- **NodeJS and npm**
-- **Python3.11**
-
-#### Backend Application
-
-1. Install the required Python dependencies:
-    ```bash
-    python3 -m pip install -r services/backend/src/requirements.txt
-    python3 -m pip install -r ../ixp-digital-twin/requirements.txt
-    ```
-
-2. Run the backend application:
-    ```bash
-    ORIGIN="http://localhost" ./run_backend.sh
-    ```
-
-#### Frontend Application
-
-1. Navigate to the frontend folder and install the necessary dependencies:
-    ```bash
-    cd services/frontend
-    npm install
-    ```
-
-2. Run the frontend application:
-    ```bash
-    bash run_frontend.sh
-    ```
-   Or:
-    ```bash
-    npm run dev
-    ```
-
-The dashboard should now be accessible via your browser at the configured URL (default: `http://localhost:3000`).
+4. Access the dashboard via your web browser (default: `http://localhost:5173`).
 
 ## Quarantine Checks
 
