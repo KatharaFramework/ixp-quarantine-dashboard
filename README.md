@@ -47,10 +47,7 @@ the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) doc
 To deploy and use the IXP Quarantine Dashboard, ensure the following prerequisites are met:
 
 - **Docker**: For simplified containerized deployment.
-- **Python 3.11 or higher**: Required to run the backend services.
-- **Node.js and npm**: Needed for the frontend application.
-
-Additionally, ensure the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) is installed and
+- [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) is installed and
 configured, as the dashboard relies on its functionalities.
 
 ## Installation
@@ -59,62 +56,56 @@ The IXP Quarantine Dashboard can be deployed and run either using Docker or by s
 
 ### Initialize the Digital Twin
 
-To set up the repository along with the `ixp-digital-twin` submodule, follow these steps:
+Assume we have a root folder called `digital-twin`.
 
-1. **Clone the Repository**  
-   Clone the main repository using the following command:
-   ```shell script
-   git clone --recurse-submodules <repository-url>
-   ```
+In `digital-twin`, clone the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) repository using the command:
+```bash
+git clone git@github.com:KatharaFramework/ixp-digital-twin.git
+```
 
-2. **Initialize and Update Submodule** (if not done during cloning)  
-   If the repository has already been cloned without submodules, initialize and update the submodule manually:
-   ```shell script
-   git submodule init
-   git submodule update
-   ```
+Add proper configurations for the IXP Digital Twin in the `digital-twin/ixp-digital-twin` folder. 
+For more information, refer to the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) setup instructions.
+ 
+In `digital-twin`, clone the IXP Quarantine Dashboard repository using the following command:
+```shell script
+git clone git@github.com:KatharaFramework/ixp-quarantine-dashboard.git
+```
 
-3. **Pull Updates for Submodule** (Optional)  
-   If necessary, ensure the submodule is up to date by running:
-   ```shell script
-   git submodule update --recursive --remote
-   ```
-
-Add proper configurations for the IXP Digital Twin to the `services/backend/src/digital_twin`
-folder. For more information, refer to the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin)
-setup instructions.
-
-After completing these steps, the submodule will be set up and ready for use. This will ensure the `ixp-digital-twin` is
-correctly located under the `services/backend/src/digital_twin` path.
+At the end, the folder structure should be:
+```
+digital-twin/
+├─ ixp-digital-twin/
+├─ ixp-quarantine-dashboard/
+```
 
 ### Running with Docker
 
 1. Run the digital twin using the `run_digital_twin.sh` script
-2. Modify the `docker-compose.yml` file to adjust ports and hostnames as needed for your environment.
-3. Start the dashboard application using Docker:
+2. Modify the `docker-compose-{dev,prod}.yml` file to adjust ports and hostnames as needed for your environment.
+  - You can change the digital twin folder from the default `../ixp-digital-twin` by changing the volume mounted for the `backend` service.
+4. Start the dashboard application using Docker:
     ```bash
     docker compose up --build -d
     ```
-4. Access the dashboard via your web browser (default: `http://localhost`).
+5. Access the dashboard via your web browser (default: `http://localhost:5173`).
 
 ### Development Setup (Running Locally)
+
+To run the dashboard locally, you additionally require:
+- **NodeJS and npm**
+- **Python3.11**
 
 #### Backend Application
 
 1. Install the required Python dependencies:
     ```bash
     python3 -m pip install -r services/backend/src/requirements.txt
-    python3 -m pip install -r services/backend/src/digital_twin/requirements.txt
+    python3 -m pip install -r ../ixp-digital-twin/requirements.txt
     ```
 
 2. Run the backend application:
     ```bash
     ORIGIN="http://localhost" ./run_backend.sh
-    ```
-   Or:
-    ```bash
-    cd services/backend/sources
-    ORIGIN="http://localhost" uvicorn main:app --reload
     ```
 
 #### Frontend Application
