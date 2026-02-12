@@ -1,12 +1,14 @@
+
 import React, {useEffect, useRef, useState} from 'react';
 import axios from "axios";
-import {Col, Container, Row} from 'react-bootstrap';
+import {Col, Container, Row, Form} from 'react-bootstrap';
 import CurrentActionCard from "../components/CurrentActionCard.jsx";
 import ResultsView from "../components/ResultsView.jsx";
 import ToggleFilter from "../components/ToggleFilter.jsx";
 import StatusCard from "../components/StatusCard.jsx";
 import QuarantineForm from "../components/QuarantineForm.jsx";
 import StopModal from "../components/StopModal.jsx";
+import ConfirmModal from "../components/ConfirmModal.jsx";
 
 const userId = "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
     (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
@@ -27,7 +29,9 @@ export default function QuarantineDashboard() {
     const [statusMsg, setStatusMsg] = useState('');
     const [checkEnded, setCheckEnded] = useState(false);
     const [showConfirmStop, setShowConfirmStop] = useState(false);
+    const [showBgpConfirm, setShowBgpConfirm] = useState(false);
     const [viewFailed, setViewFailed] = useState(1);
+    const [bgpCheckActive, setBgpCheckActive] = useState(false);
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -64,7 +68,7 @@ export default function QuarantineDashboard() {
         data.uid = userId;
         data.last = last;
         return new Promise((resolve, reject) => {
-            axios.post(`${apiUrl}/check/${data.action}`, data, { signal: signal })
+            axios.post(`${apiUrl}/check/${data.action}`, data, {signal: signal})
                 .then(response => {
                     if (response.data && response.data.data && response.data.data.results) {
                         resolve(response.data.data);
@@ -83,9 +87,13 @@ export default function QuarantineDashboard() {
         setViewFailed(val);
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const getFilteredActionOptions = (actionOptions, bgpCheckActive) => {
+        return bgpCheckActive
+            ? actionOptions
+            : actionOptions.filter(action => !action.toLowerCase().includes("bgp."));
+    };
 
+    const proceedWithCheck = async () => {
         setLoadingQuarantineCheck(true);
         setStatus('');
         setStatusMsg('');
@@ -107,7 +115,9 @@ export default function QuarantineDashboard() {
         };
 
         try {
-            for (const [i, action] of actionOptions.entries()) {
+            const filteredActionOptions = getFilteredActionOptions(actionOptions, bgpCheckActive);
+
+            for (const [i, action] of filteredActionOptions.entries()) {
                 if (stopCheck.current)
                     break;
 
@@ -164,6 +174,26 @@ export default function QuarantineDashboard() {
         setLoadingQuarantineCheck(false);
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (bgpCheckActive) {
+            setShowBgpConfirm(true);
+            return;
+        }
+
+        await proceedWithCheck();
+    };
+
+    const handleBgpConfirm = async () => {
+        setShowBgpConfirm(false);
+        await proceedWithCheck();
+    };
+
+    const handleBgpCancel = () => {
+        setShowBgpConfirm(false);
+    };
+
     const handleStopClick = () => {
         setShowConfirmStop(true);
     };
@@ -184,6 +214,7 @@ export default function QuarantineDashboard() {
     return (
         <Container>
             <h1 className="text-center mb-4">IXP Quarantine Checker</h1>
+
             <QuarantineForm
                 asn={asn}
                 setAsn={setAsn}
@@ -197,13 +228,16 @@ export default function QuarantineDashboard() {
                 currentAction={currentAction}
                 handleStopClick={handleStopClick}
                 handleSubmit={handleSubmit}
+                bgpCheckActive={bgpCheckActive}
+                setBgpCheckActive={setBgpCheckActive}
             />
+
             <br/>
             <Row className="justify-content-center align-content-center">
                 <Container>
                     {
                         checkEnded ?
-                            <StatusCard status={status} msg={statusMsg} />
+                            <StatusCard status={status} msg={statusMsg}/>
                             :
                             (
                                 <div ref={currentActionRef}>
@@ -215,7 +249,7 @@ export default function QuarantineDashboard() {
                     <Row className="align-items-center my-3">
                         <Col className="d-flex justify-content-end">
                             {(loadingQuarantineCheck || checkEnded) && results.length > 0 && (
-                                <ToggleFilter viewFailed={viewFailed} handleFilter={handleFilter} />
+                                <ToggleFilter viewFailed={viewFailed} handleFilter={handleFilter}/>
                             )}
                         </Col>
                     </Row>
@@ -226,6 +260,12 @@ export default function QuarantineDashboard() {
                         show={showConfirmStop}
                         onConfirm={handleConfirmStop}
                         onCancel={handleCancelStop}
+                    />
+
+                    <ConfirmModal
+                        show={showBgpConfirm}
+                        onConfirm={handleBgpConfirm}
+                        onCancel={handleBgpCancel}
                     />
                 </Container>
             </Row>
