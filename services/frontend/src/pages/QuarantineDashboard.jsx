@@ -115,7 +115,12 @@ export default function QuarantineDashboard() {
         };
 
         try {
-            const filteredActionOptions = getFilteredActionOptions(actionOptions, bgpCheckActive);
+            // Fetch actions every time before running checks
+            const actionsResponse = await axios.get(`${apiUrl}/check`, { signal: abortControllerRef.current.signal });
+            const fetchedActions = actionsResponse.data || [];
+            setActionOptions(fetchedActions);
+
+            const filteredActionOptions = getFilteredActionOptions(fetchedActions, bgpCheckActive);
 
             for (const [i, action] of filteredActionOptions.entries()) {
                 if (stopCheck.current)
@@ -125,7 +130,7 @@ export default function QuarantineDashboard() {
                 setCurrentAction(action);
                 data.action = action;
 
-                const last = (i === actionOptions.length - 1);
+                const last = (i === filteredActionOptions.length - 1);
 
                 const result = await runCheck(data, last, abortControllerRef.current.signal);
                 newResults = [result, ...newResults];
