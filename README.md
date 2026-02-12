@@ -12,6 +12,9 @@ running connectivity, routing, and security checks. It helps IXPs and their cust
 controlled emulation environment, reducing the risks posed to the actual production network during the onboarding
 process.
 
+## Tutorial
+A comprehensive tutorial is available in the [wiki](https://github.com/KatharaFramework/ixp-digital-twin/wiki), explaining how to configure the [digital twin](https://github.com/KatharaFramework/ixp-digital-twin), its [management dashboard](https://github.com/KatharaFramework/ixp-digital-twin-dashboard), and the [quarantine dashboard](https://github.com/KatharaFramework/ixp-quarantine-dashboard).
+
 ### Why Use the IXP Quarantine Dashboard?
 
 - **User-Friendly Interface**: Manage all quarantine checks and view their statuses through a clean and modern web-based
