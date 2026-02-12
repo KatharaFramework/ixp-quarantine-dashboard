@@ -47,10 +47,7 @@ the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) doc
 To deploy and use the IXP Quarantine Dashboard, ensure the following prerequisites are met:
 
 - **Docker**: For simplified containerized deployment.
-- **Python 3.11 or higher**: Required to run the backend services.
-- **Node.js and npm**: Needed for the frontend application.
-
-Additionally, ensure the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) is installed and
+- [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin) is installed and
 configured, as the dashboard relies on its functionalities.
 
 ## Installation
@@ -59,82 +56,44 @@ The IXP Quarantine Dashboard can be deployed and run either using Docker or by s
 
 ### Initialize the Digital Twin
 
-To set up the repository along with the `ixp-digital-twin` submodule, follow these steps:
+Clone the IXP Quarantine Dashboard repository using the following command:
+```shell script
+git clone git@github.com:KatharaFramework/ixp-quarantine-dashboard.git
+```
 
-1. **Clone the Repository**  
-   Clone the main repository using the following command:
-   ```shell script
-   git clone --recurse-submodules <repository-url>
-   ```
+Enter the folder:
+```shell script
+cd ixp-quarantine-dashboard
+```
 
-2. **Initialize and Update Submodule** (if not done during cloning)  
-   If the repository has already been cloned without submodules, initialize and update the submodule manually:
-   ```shell script
-   git submodule init
-   git submodule update
-   ```
-
-3. **Pull Updates for Submodule** (Optional)  
-   If necessary, ensure the submodule is up to date by running:
-   ```shell script
-   git submodule update --recursive --remote
-   ```
-
-Add proper configurations for the IXP Digital Twin to the `services/backend/src/digital_twin`
-folder. For more information, refer to the [IXP Digital Twin](https://github.com/KatharaFramework/ixp-digital-twin)
-setup instructions.
-
-After completing these steps, the submodule will be set up and ready for use. This will ensure the `ixp-digital-twin` is
-correctly located under the `services/backend/src/digital_twin` path.
+Clone the IXP Digital Twin in the parent folder:
+```shell script
+./init_digital_twin.sh
+```
+This will clone into the `../ixp-digital-twin/` folder. You can change the destination folder by running: `./init_digital_twin.sh /another/folder`.
 
 ### Running with Docker
 
 1. Run the digital twin using the `run_digital_twin.sh` script
-2. Modify the `docker-compose.yml` file to adjust ports and hostnames as needed for your environment.
+    1. You can change the default digital twin folder `../ixp-digital-twin` by passing the new path as argument:
+   ```shell script
+    ./run_digital_twin.sh /another/folder
+    ```
+2. Modify the `docker-compose-{dev,prod}.yml` file to adjust ports and hostnames as needed for your environment. 
+   1. You can change the default digital twin folder `../ixp-digital-twin` by changing the volume mounted for the `backend` service:
+       ```yaml
+         - services:
+           backend:
+             build: ./services/backend
+             volumes:
+               ...
+               - ../ixp-digital-twin:/app/src/digital_twin # => Change to /another/folder:/app/src/digital_twin
+       ```
 3. Start the dashboard application using Docker:
     ```bash
     docker compose up --build -d
     ```
-4. Access the dashboard via your web browser (default: `http://localhost`).
-
-### Development Setup (Running Locally)
-
-#### Backend Application
-
-1. Install the required Python dependencies:
-    ```bash
-    python3 -m pip install -r services/backend/src/requirements.txt
-    python3 -m pip install -r services/backend/src/digital_twin/requirements.txt
-    ```
-
-2. Run the backend application:
-    ```bash
-    ORIGIN="http://localhost" ./run_backend.sh
-    ```
-   Or:
-    ```bash
-    cd services/backend/sources
-    ORIGIN="http://localhost" uvicorn main:app --reload
-    ```
-
-#### Frontend Application
-
-1. Navigate to the frontend folder and install the necessary dependencies:
-    ```bash
-    cd services/frontend
-    npm install
-    ```
-
-2. Run the frontend application:
-    ```bash
-    bash run_frontend.sh
-    ```
-   Or:
-    ```bash
-    npm run dev
-    ```
-
-The dashboard should now be accessible via your browser at the configured URL (default: `http://localhost:3000`).
+4. Access the dashboard via your web browser (default: `http://localhost:5173`).
 
 ## Quarantine Checks
 

@@ -6,6 +6,7 @@ services:
     volumes:
       - ./services/backend:/app
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../ixp-digital-twin:/app/src/digital_twin
     environment:
       - "ORIGIN=http://localhost:5173"
       - "ENVIRONMENT=dev"

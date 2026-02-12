@@ -1,3 +1,0 @@
-[submodule "ixp-digital-twin"]
-	path = services/backend/src/digital_twin
-	url = ../ixp-digital-twin.git

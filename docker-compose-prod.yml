@@ -4,6 +4,7 @@ services:
     volumes:
       - ./services/backend:/app
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../ixp-digital-twin:/app/src/digital_twin
     environment:
       - "ORIGIN=http://public.domain.quarantine.ui"
       - "ENVIRONMENT=prod"
