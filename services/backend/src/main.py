@@ -150,9 +150,10 @@ def get_member_entries(settings: settings_module.Settings) -> dict[str, BGPNeigh
     return entries
 
 
-def validate_member(members: dict[str, BGPNeighbour], member_args: dict[str, Any]) -> None:
+def validate_member(scenario: Lab, members: dict[str, BGPNeighbour], member_args: dict[str, Any]) -> None:
     as_id = f"as{member_args['asn']}"
-    if as_id not in members:
+    as_devices_running = [x for x in scenario.machines.keys() if x.startswith(as_id)]
+    if not as_devices_running:
         # The ASN is not in the members, hence we assume that it is the one to test
         return
 
@@ -246,6 +247,7 @@ def run_action(
             )
         )
     except Exception as e:
+        delete_lock()
         loop.call_soon_threadsafe(future.set_exception, e)
 
 
@@ -354,7 +356,7 @@ async def post_check_action(request: CheckRequest, disconnector: CancelOnDisconn
 
     try:
         if env_settings.environment != "dev":
-            validate_member(entries, check_args)
+            validate_member(network_scenario, entries, check_args)
         validate_member_ips(settings, check_args["ipv4"], check_args["ipv6"])
     except Exception as e:
         raise HTTPException(
