@@ -14,4 +14,4 @@ RUN git clone https://github.com/KatharaFramework/ixp-digital-twin.git && \
     pip install -r ixp-digital-twin/requirements.txt && \
     rm -rf ixp-digital-twin
 
-COPY src/ .
+COPY src/ ./src/
