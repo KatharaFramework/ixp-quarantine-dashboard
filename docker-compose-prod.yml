@@ -21,7 +21,7 @@ services:
     networks:
       - my_network
     environment:
-      - "VITE_API_URL=https://public.domain.quarantine.ui/api"
+      - "VITE_API_URL=/api"
     depends_on:
       - backend
   reverse-proxy:
