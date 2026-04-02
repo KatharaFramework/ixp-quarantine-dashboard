@@ -1,4 +1,4 @@
-FROM nginx:1.19
+FROM nginx:1.29
 
 # Install apache2-utils to get htpasswd command
 RUN apt-get update -y && apt-get install -y apache2-utils && rm -rf /var/lib/apt/lists/*
