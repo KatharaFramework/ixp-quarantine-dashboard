@@ -11,20 +11,10 @@ services:
     uts: host
     networks:
       - my_network
-  frontend:
-    build: ./services/frontend
-    volumes:
-      - './services/frontend:/app'
-      - '/app/node_modules'
-    command: npm run dev
-    networks:
-      - my_network
-    environment:
-      - "VITE_API_URL=/api"
-    depends_on:
-      - backend
   reverse-proxy:
-    build: ./services/reverse-proxy
+    build:
+      context: ./services/
+      dockerfile: Dockerfile
     networks:
       - my_network
     ports:
@@ -39,7 +29,7 @@ services:
       - "FORWARD_PORT_API=8000"
       - "PUBLIC_DOMAIN=public.domain.quarantine.ui"
     depends_on:
-      - frontend
+      - backend
 networks:
   my_network:
     driver: bridge

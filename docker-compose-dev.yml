@@ -14,10 +14,12 @@ services:
     networks:
       - my_network
   frontend:
-    build: ./services/frontend
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile.dev
     volumes:
-      - './services/frontend:/app'
-      - '/app/node_modules'
+      - "./services/frontend:/app"
+      - "/app/node_modules"
     command: npm run dev
     networks:
       - my_network
