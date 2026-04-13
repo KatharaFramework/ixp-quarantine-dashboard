@@ -18,6 +18,8 @@ WORKDIR /
 COPY reverse-proxy/nginx.conf nginx.conf
 COPY reverse-proxy/certs /root/certs
 COPY --from=frontend-builder /app/dist/ /var/www/
+RUN mkdir -p /var/www/public
+COPY --from=frontend-builder /app/public/ /var/www/public
 
 # Startup script
 COPY reverse-proxy/run.sh ./
